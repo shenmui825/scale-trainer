@@ -291,6 +291,8 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 .fxsl{display:grid;grid-template-columns:64px 1fr 56px;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:4px 0}.fxsl output{text-align:right;color:var(--text);font-weight:700}
 .fxgrp.off .fxsl{opacity:.4}
 .vjwarn{margin-top:8px;background:rgba(245,179,1,.12);border:1px solid rgba(245,179,1,.5);color:#f8d77a;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5}
+.vjres{display:none;position:absolute;left:12px;bottom:28px;background:rgba(0,0,0,.55);color:#fff;font-weight:700;border-radius:99px;padding:5px 10px;font-size:12px;white-space:nowrap}
+.vjres.on{display:inline-block}
 </style>
 </head>
 <body>
@@ -392,6 +394,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
    <video id="vjPrev" muted playsinline autoplay></video>
    <div class="vjtop"><span id="vjRecDot" class="vjrec">REC <b id="vjTime">00:00</b></span><span id="vjClip" class="vjclip">CLIP</span><button id="vjFlip" class="vjicon" aria-label="Tukar kamera depan atau belakang"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><path d="M9 13a3 3 0 0 0 5 2M15 12a3 3 0 0 0-5-2"/></svg></button></div>
    <div id="vjMsg" class="vjmsg">Tekan "Buka kamera" untuk mula.</div>
+   <span id="vjRes" class="vjres"></span>
    <div class="vjmeter"><div id="vjLvl"></div></div>
   </div>
   <div class="vjctl">
@@ -1538,7 +1541,7 @@ async function vjOpenCam(){
     vjVid=await navigator.mediaDevices.getUserMedia({video:{facingMode:vjFacing,width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}}});
     const v=$('vjPrev'); v.srcObject=vjVid; v.classList.toggle('mirror',vjFacing==='user'); v.play().catch(()=>{});
     await vjListAud(); await vjOpenAudio(); await vjListAud();
-    vjMsg(''); $('vjCam').textContent='Kamera dibuka';
+    vjMsg(''); $('vjCam').textContent='Kamera dibuka'; vjShowRes();
   }catch(e){ vjMsg('Tak dapat buka kamera atau input bunyi: '+e.message); }
 }
 $('vjCam').onclick=vjOpenCam;
@@ -1589,6 +1592,15 @@ navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.media
 function renderJam(){ if(!vjVid) vjMsg('Tekan "Buka kamera" untuk mula.'); }
 
 
+
+
+function vjShowRes(){
+  const el=$('vjRes'), t=vjVid&&vjVid.getVideoTracks()[0]; if(!t){ el.classList.remove('on'); return; }
+  const st=t.getSettings?t.getSettings():{}; let w=st.width||$('vjPrev').videoWidth, h=st.height||$('vjPrev').videoHeight, fps=st.frameRate?Math.round(st.frameRate):null;
+  if(!w||!h){ setTimeout(vjShowRes,400); return; }
+  const lo=Math.min(w,h), q=lo>=2160?'4K':lo>=1440?'1440p':lo>=1080?'1080p':lo>=720?'720p':lo+'p';
+  el.textContent=q+' · '+w+'×'+h+(fps?' · '+fps+'fps':''); el.classList.add('on');
+}
 
 // ---------- Kesan audio rakaman ----------
 let afx=null;
