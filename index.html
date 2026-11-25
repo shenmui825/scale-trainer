@@ -1504,10 +1504,11 @@ $('vjRec').onclick=async()=>{
     const dur=(performance.now()-vjT0)/1000; vjN++; vjRecObj=null;
     if(vjN===1) $('vjList').innerHTML='';
     const el=document.createElement('div'); el.className='vjitem';
-    el.innerHTML=`<div class="rt"><span>Video ${vjN} · ${vjFmt(dur)}</span><span>${(blob.size/1048576).toFixed(1)} MB · ${ext.toUpperCase()}</span></div><video controls playsinline src="${url}"></video><div class="vjbtns"><a href="${url}" download="${nm}">Simpan</a><button type="button">Kongsi</button></div>`;
+    el.innerHTML=`<div class="rt"><span>Video ${vjN} · ${vjFmt(dur)}</span><span>${(blob.size/1048576).toFixed(1)} MB · ${ext.toUpperCase()}</span></div><video controls playsinline src="${url}"></video><div class="vjbtns"><a href="${url}" download="${nm}">Simpan semula</a><button type="button">Kongsi</button></div>`;
     el.querySelector('button').onclick=async()=>{ const f=new File([blob],nm,{type}); if(navigator.canShare&&navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f],title:'Video jam'}); }catch(e){} } else toast('Kongsi tak disokong di browser ini. Guna Simpan.'); };
     $('vjList').prepend(el);
-    toast('Video disimpan dalam senarai rakaman. Tekan Simpan untuk muat turun.',3500);
+    try{ const a=document.createElement('a'); a.href=url; a.download=nm; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(()=>a.remove(),1000); toast('Video disimpan automatik ke folder Downloads: '+nm,4500); }
+    catch(e){ toast('Tak dapat simpan automatik. Tekan Simpan untuk muat turun.',4000); }
   };
   vjRecObj.start(1000); vjT0=performance.now();
   $('vjRec').classList.add('on'); $('vjRecDot').classList.add('on');
