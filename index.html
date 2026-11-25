@@ -294,6 +294,49 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 .vjres{display:none;position:absolute;left:12px;bottom:28px;background:rgba(0,0,0,.55);color:#fff;font-weight:700;border-radius:99px;padding:5px 10px;font-size:12px;white-space:nowrap}
 .vjres.on{display:inline-block}
 .verfoot{text-align:center;color:var(--muted);font-size:12px;padding:14px 0 6px;opacity:.8}
+
+/* ===== Paparan telefon ===== */
+@media(max-width:900px){
+ body{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+ .rail{position:fixed!important;top:auto!important;bottom:0;left:0;right:0;margin:0!important;border-radius:22px 22px 0 0!important;padding:6px 6px calc(6px + env(safe-area-inset-bottom))!important;background:#0b1a38!important;border:1px solid var(--line);border-bottom:0;box-shadow:0 -8px 28px rgba(0,0,0,.55)!important;z-index:50;gap:4px}
+ .rail .tab{padding:8px 2px!important;border-radius:14px}
+ .app{padding:14px 12px 0}
+ header{margin-bottom:10px}
+ header h1{font-size:23px}
+ #status{font-size:11px;padding:5px 10px}
+ #inPanel{padding:10px 12px;margin-bottom:12px}
+ #inPanel .hint{display:none}
+ #inPanel .row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:end}
+ #inPanel label:has(#onDot),#inPanel label:has(#pitchRead){display:none}
+ #inPanel label:has(#lvl){grid-column:1/-1}
+ #inPanel select{width:100%}
+ .panel{padding:12px;border-radius:18px}
+ .pwrap{gap:12px}
+ .nowrow{flex-direction:column;align-items:stretch;gap:8px}
+ #playNow{font-size:16px}
+ .vsw{align-self:flex-start}.vsw button[data-v=both]{display:none}
+ #boardPanel[data-view=both] #board,#boardPanel[data-view=both] .lgB{display:none}
+ #boardPanel[data-view=both] #hwy{display:block}
+ #boardPanel[data-view=both] .lgT{display:flex}
+ .legend .lgs{display:none}
+ #lane{gap:4px}.chipn{font-size:15px;padding:8px 0;border-radius:10px}
+ body[data-mode=practice] .app{padding-bottom:84px}
+ .rside .rcard{padding:12px;gap:10px;backdrop-filter:none;-webkit-backdrop-filter:none;background:#0d1a33}
+ .rtop{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center}
+ .ringwrap{width:84px;height:84px}.ringtxt b{font-size:20px}.ringtxt span{font-size:10px}
+ .combo b{font-size:40px}
+ .nowcard{padding:8px}.nowcard .orb{width:52px;height:52px}.nowcard #tgt{font-size:24px}
+ #tm{height:36px}#trend{display:none}
+ .rside #stats{grid-template-columns:repeat(3,minmax(0,1fr))}.rside .st b{font-size:16px}
+ .rside #btnGo{position:fixed;left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom));width:auto;z-index:40;min-height:54px;border-radius:16px}
+ .side .row{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
+ .side .row>*{min-width:0}
+ .side .fld.wide,.side .row>label.inline,.side .row>label:has(#scale){grid-column:1/-1}
+ .side select{width:100%!important}
+ .keypills{grid-template-columns:repeat(6,minmax(0,1fr))!important;width:100%}
+ .kp{min-height:40px}
+ .tuner .pegcol{gap:10px}
+}
 </style>
 </head>
 <body>
@@ -302,7 +345,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 <header><h1 id="appTitle">🎸 Video Jamming</h1><span id="status" class="chip">Input belum disambung</span></header>
 
 
-<section class="panel">
+<section class="panel" id="inPanel">
  <div class="row">
   <button id="btnConnect" class="primary">Sambung input</button>
   <label>Peranti input<select id="dev"><option>—</option></select></label>
@@ -525,7 +568,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.9.0 (25 Nov 2026)";
+const VER="0.9.1 (25 Nov 2026)";
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
 'use strict';
 const $=id=>document.getElementById(id);
@@ -952,7 +995,7 @@ function startSession(){
   const beat=60/S.bpm, t0=ctx.currentTime+0.3;
   sess={mode:'play',t0,beat,sd:beat/S.per,stepStart:t0+4*beat,res:{},missPtr:0,nextBeat:0,nextSub:0,nextStep:0,round:0};
   stats=newStats(); running='play';
-  $('btnGo').textContent='■ Henti (Space)'; $('btnGo').classList.add('stop');
+  $('btnGo').textContent=window.innerWidth<=900?'■ Henti':'■ Henti (Space)'; $('btnGo').classList.add('stop');
   schedTimer=setInterval(schedule,25); lastKey=''; renderStats();
 }
 function startCalib(){
@@ -966,7 +1009,7 @@ function startCalib(){
 function stopSession(){
   try{ saveHistory(); }catch(e){}
   clearInterval(schedTimer); running=false; sess=null;
-  $('btnGo').textContent='▶ Mula (Space)'; $('btnGo').classList.remove('stop');
+  $('btnGo').textContent=window.innerWidth<=900?'▶ Mula':'▶ Mula (Space)'; $('btnGo').classList.remove('stop');
 }
 function schedule(){
   if(!sess) return;
@@ -1406,16 +1449,19 @@ document.addEventListener('click',e=>{ if(e.target.closest('button')) uiClick();
 
 // ---------- Tab bergerak ----------
 let hwyKey=null;
+window.addEventListener('resize',()=>{ hwyKey=null; });
 function applyView(){
   if(!['board','both'].includes(S.view)) S.view='tab';
   $('boardPanel').dataset.view=S.view; hwyKey=null;
-  document.querySelectorAll('.vsw button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.view));
+  const mob=window.innerWidth<=900, shown=(mob&&S.view==='both')?'tab':S.view;
+  document.querySelectorAll('.vsw button').forEach(b=>b.classList.toggle('on',b.dataset.v===shown));
 }
 document.querySelectorAll('.vsw button').forEach(b=>b.addEventListener('click',()=>{ S.view=b.dataset.v; save(); applyView(); }));
 function drawHwy(rel){
   const HIT=150, sdv=60/S.bpm/S.per, pps=Math.max(175,54/sdv);
-  let h='<rect width="960" height="270" rx="14" fill="#0b1a38"/>';
-  for(let st=0;st<6;st++){ const y=SY(st); h+=`<line x1="40" x2="950" y1="${y}" y2="${y}" stroke="#6f82ad" stroke-width="${1+st*.5}" opacity=".8"/><text x="16" y="${y+7}" font-size="19" font-weight="700" text-anchor="middle" fill="#c6d3f0">${st+1}</text>`; }
+  const HW=window.innerWidth<=700?600:960; $('hwy').setAttribute('viewBox','0 0 '+HW+' 270');
+  let h=`<rect width="${HW}" height="270" rx="14" fill="#0b1a38"/>`;
+  for(let st=0;st<6;st++){ const y=SY(st); h+=`<line x1="40" x2="${HW-10}" y1="${y}" y2="${y}" stroke="#6f82ad" stroke-width="${1+st*.5}" opacity=".8"/><text x="16" y="${y+7}" font-size="19" font-weight="700" text-anchor="middle" fill="#c6d3f0">${st+1}</text>`; }
   h+=`<rect x="${HIT-12}" y="2" width="24" height="266" rx="10" fill="#f5b301" opacity=".14"/><rect x="${HIT-3}" y="2" width="6" height="266" rx="3" fill="#f5b301"/>`;
   const i0=Math.max(0,Math.floor(rel/sdv)-3), i1=Math.ceil(((950-HIT)/pps+rel)/sdv)+1;
   for(let i=i0;i<=i1;i++){
@@ -1732,6 +1778,7 @@ $('balTest').onclick=async()=>{
 
 
 $('verFoot').textContent='Video Jamming · versi '+VER+' · '+VER_STAGE;
+if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
 </script>
