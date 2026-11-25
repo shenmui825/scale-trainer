@@ -341,35 +341,35 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 /* ===== Video Jam skrin penuh (telefon) ===== */
 .vjmob{display:none}
 .vjsheet .panel{margin-bottom:12px}
-@media(max-width:900px){
- .vjmob{display:flex}
- body[data-mode=jam]{padding-bottom:0!important;overflow:hidden}
- body[data-mode=jam] .rail,body[data-mode=jam] header,body[data-mode=jam] #inPanel,body[data-mode=jam] .verfoot{display:none!important}
- body[data-mode=jam] .app{padding:0!important}
- .vjpanel{padding:0!important;border:0!important;background:none!important;backdrop-filter:none!important;margin:0!important}
- .vjstage{position:fixed!important;inset:0;width:100vw;height:100dvh;max-height:none!important;aspect-ratio:auto!important;border-radius:0!important;z-index:60;touch-action:none}
- .vjtop{top:calc(10px + env(safe-area-inset-top));gap:8px;align-items:center}
- .vjtop .vjrec{margin-left:auto}.vjtop #vjFlip{margin-left:auto}
- .vjicon{background:rgba(0,0,0,.38)!important;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)!important}
- .vjclip{margin:0}
- #vjRes{top:calc(64px + env(safe-area-inset-top));bottom:auto;left:12px}
- .vjmeter{top:calc(100px + env(safe-area-inset-top));bottom:auto;left:12px;right:auto;width:140px;height:6px}
- .vjctl{position:absolute;left:0;right:0;bottom:0;margin:0!important;padding:28px 18px calc(28px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.55));transform:translateY(115%);transition:transform .28s ease;z-index:3}
- .vjstage.ctl .vjctl{transform:none}
- .vjspot{background:rgba(29,185,84,.32)!important;color:#fff!important;border:1px solid rgba(29,185,84,.75);backdrop-filter:blur(8px)}
- .vjside{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;backdrop-filter:blur(8px)}
- .vjrecb{background:rgba(255,255,255,.08)!important}
- .vjhandle{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.7);transition:opacity .2s;pointer-events:auto;cursor:pointer;z-index:2}
- .vjhandle span{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.8)}
- .vjstage.ctl .vjhandle{opacity:0;pointer-events:none}
- .vjmsg{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8)}
- .vjshade{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:65;display:none}
- .vjshade.on{display:block}
- .vjsheet{position:fixed;left:0;right:0;bottom:0;max-height:86dvh;overflow:auto;background:#0b1a38;border-radius:22px 22px 0 0;z-index:70;transform:translateY(105%);transition:transform .3s ease;padding:0 12px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.5)}
- .vjsheet.on{transform:none}
- .vjsheethd{position:sticky;top:0;z-index:2;background:#0b1a38;justify-content:space-between;align-items:center;padding:14px 4px 10px;font-size:17px}
- .vjsheet .panel{backdrop-filter:none;background:rgba(255,255,255,.03)}
-}
+ body.touchdev .vjmob{display:flex}
+ body.touchdev[data-mode=jam]{padding-bottom:0!important;overflow:hidden}
+ body.touchdev[data-mode=jam] .rail,body.touchdev[data-mode=jam] header,body.touchdev[data-mode=jam] #inPanel,body.touchdev[data-mode=jam] .verfoot{display:none!important}
+ body.touchdev[data-mode=jam] .app{padding:0!important}
+ body.touchdev .vjpanel{padding:0!important;border:0!important;background:none!important;backdrop-filter:none!important;margin:0!important}
+ body.touchdev .vjstage{position:fixed!important;inset:0;width:100vw;height:100dvh;max-height:none!important;aspect-ratio:auto!important;border-radius:0!important;z-index:60;touch-action:none}
+ body.touchdev .vjtop{top:calc(10px + env(safe-area-inset-top));gap:8px;align-items:center}
+ body.touchdev .vjtop .vjrec{margin-left:auto}
+ body.touchdev .vjtop #vjFlip{margin-left:auto}
+ body.touchdev .vjicon{background:rgba(0,0,0,.38)!important;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)!important}
+ body.touchdev .vjclip{margin:0}
+ body.touchdev #vjRes{top:calc(64px + env(safe-area-inset-top));bottom:auto;left:12px}
+ body.touchdev .vjmeter{top:calc(100px + env(safe-area-inset-top));bottom:auto;left:12px;right:auto;width:140px;height:6px}
+ body.touchdev .vjctl{position:absolute;left:0;right:0;bottom:0;margin:0!important;padding:28px 18px calc(28px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.55));transform:translateY(115%);transition:transform .28s ease;z-index:3}
+ body.touchdev .vjstage.ctl .vjctl{transform:none}
+ body.touchdev .vjspot{background:rgba(29,185,84,.32)!important;color:#fff!important;border:1px solid rgba(29,185,84,.75);backdrop-filter:blur(8px)}
+ body.touchdev .vjside{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;backdrop-filter:blur(8px)}
+ body.touchdev .vjrecb{background:rgba(255,255,255,.08)!important}
+ body.touchdev .vjhandle{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.7);transition:opacity .2s;pointer-events:auto;cursor:pointer;z-index:2}
+ body.touchdev .vjhandle span{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.8)}
+ body.touchdev .vjstage.ctl .vjhandle{opacity:0;pointer-events:none}
+ body.touchdev .vjmsg{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+ body.touchdev .vjshade{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:65;display:none}
+ body.touchdev .vjshade.on{display:block}
+ body.touchdev .vjsheet{position:fixed;left:0;right:0;bottom:0;max-height:86dvh;overflow:auto;background:#0b1a38;border-radius:22px 22px 0 0;z-index:70;transform:translateY(105%);transition:transform .3s ease;padding:0 12px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+ body.touchdev .vjsheet.on{transform:none}
+ body.touchdev .vjsheethd{position:sticky;top:0;z-index:2;background:#0b1a38;justify-content:space-between;align-items:center;padding:14px 4px 10px;font-size:17px}
+ body.touchdev .vjsheet .panel{backdrop-filter:none;background:rgba(255,255,255,.03)}
+
 </style>
 </head>
 <body>
@@ -608,7 +608,9 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.10.1 (25 Nov 2026)";
+const VER="0.11.0 (25 Nov 2026)";
+const IS_TOUCHDEV=(()=>{ try{ if(navigator.userAgentData&&navigator.userAgentData.mobile) return true; }catch(e){} const ua=navigator.userAgent||''; if(/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua)) return true; if(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1) return true; return false; })();
+document.body.classList.toggle('touchdev',IS_TOUCHDEV);
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
 'use strict';
 const $=id=>document.getElementById(id);
@@ -1380,7 +1382,7 @@ app:{g:'Aplikasi',t:'Cara guna aplikasi',h:()=>
  H('Maksud keputusan')+P('Tepat: nota betul dan masa dalam julat toleransi. Awal atau Lambat: nota betul tetapi terlalu awal atau lewat. Nota salah: nota yang dipetik bukan nota sasaran. Terlepas: tiada nota dikesan pada masanya. Meter ketepatan menunjukkan sisihan setiap petikan dalam milisaat.')+
  H('Tetapan penting')+P('Toleransi: berapa ms dianggap tepat. Sensitiviti: kalau petikan tak dikesan, naikkan. Kalau bunyi bising dikesan, turunkan. Kalibrasi: ukur kelewatan sistem kau supaya timing adil. Nota per beat: 1 nota setiap klik, 2 (separuh), 3 (triplet) atau 4 (suku). Bunyi tali: nota sasaran berbunyi sendiri sebagai panduan. Buzzer: bunyi amaran bila salah.')+
 
- H('Keperluan Video Jam (telefon)')+P('Tab Jam di telefon memerlukan multi-effect yang menyokong USB OTG, iaitu boleh berfungsi sebagai peranti audio USB terus dengan telefon tanpa driver. Kebanyakan multi-effect ada port USB, tetapi sesetengahnya hanya untuk kemas kini firmware atau perlukan driver di komputer, jadi tidak boleh digunakan dengan telefon.')+
+ H('Keperluan Video Jam (telefon)')+P('Tab Jam hanya tersedia di telefon dan tablet. Ia tidak dipaparkan di laptop atau PC.')+P('Tab Jam di telefon memerlukan multi-effect yang menyokong USB OTG, iaitu boleh berfungsi sebagai peranti audio USB terus dengan telefon tanpa driver. Kebanyakan multi-effect ada port USB, tetapi sesetengahnya hanya untuk kemas kini firmware atau perlukan driver di komputer, jadi tidak boleh digunakan dengan telefon.')+
  P('Cara semak: sambung multi-effect ke telefon dengan kabel OTG, buka tab Jam dan tekan Kamera, kemudian buka Tetapan (ikon gear). Kalau senarai Input bunyi menunjukkan peranti USB atau nama multi-effect, ia boleh digunakan. Semak juga manual atau laman pengeluar untuk perkataan "USB OTG", "class compliant" atau "USB audio interface".')+
  P('Untuk bunyi Spotify masuk ke rakaman, multi-effect juga perlu menghantar bunyi dari telefon (playback USB) bercampur dengan gitar ke rakaman USB. Tidak semua model melakukannya.')+
  H('Tuner')+P('Tab Tuner menunjukkan nota yang kau petik dan sama ada ia sharp atau flat. Tekan pasak tali untuk dengar nota rujukan. A4 = 440 Hz secara default.')+
@@ -1440,6 +1442,7 @@ function renderNota(){
 // ---------- Mod ----------
 const MODE_TITLE={tuner:'Guitar Tuner',practice:'Latihan Scale',jam:'Video Jamming',prog:'Kemajuan',nota:'Informasi'};
 function setMode(m){
+  if(m==='jam'&&!IS_TOUCHDEV) m='practice';
   if(S.mode&&S.mode!=='jam'&&m==='jam') S.lastMode=S.mode;
   S.mode=m; save(); document.body.dataset.mode=m;
   { const t=MODE_TITLE[m]||'Video Jamming'; $('appTitle').textContent='🎸 '+t; document.title=t; }
@@ -1681,7 +1684,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&vjRecObj) toast('Rakaman mungkin terhenti bila keluar dari app.',4000);
 });
 navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',vjListAud);
-function renderJam(){ if(!vjVid) vjMsg(window.innerWidth<=900?'Leret ke atas, kemudian tekan "Kamera" untuk mula.':'Tekan "Kamera" untuk mula.'); }
+function renderJam(){ if(!vjVid) vjMsg(IS_TOUCHDEV?'Leret ke atas, kemudian tekan "Kamera" untuk mula.':'Tekan "Kamera" untuk mula.'); }
 
 
 
@@ -1832,7 +1835,7 @@ if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
   st.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
   st.addEventListener('touchend',e=>{ if(y0===null) return; const dy=e.changedTouches[0].clientY-y0; y0=null; if(Date.now()-t0>800) return; if(dy<-40) showCtl(true); else if(dy>40) showCtl(false); },{passive:true});
   $('vjHandle').onclick=()=>showCtl(true);
-  const ctl=document.querySelector('.vjctl'), mq=window.matchMedia?window.matchMedia('(max-width:900px)'):{matches:window.innerWidth<=900,addListener(){}};
+  const ctl=document.querySelector('.vjctl'), mq={matches:IS_TOUCHDEV,addListener(){}};
   const place=()=>{ if(mq.matches){ if(ctl.parentNode!==st) st.appendChild(ctl); } else if(ctl.parentNode===st) st.after(ctl); };
   place(); mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place);
   const sheet=$('vjSheet'), shade=$('vjShade');
@@ -1843,6 +1846,7 @@ if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
   $('vjExit').onclick=()=>{ if(vjRecObj){ toast('Hentikan rakaman dulu.'); return; } openSheet(false); setMode(S.lastMode&&S.lastMode!=='jam'?S.lastMode:'practice'); };
 })();
 
+if(!IS_TOUCHDEV){ $('tabJam').style.display='none'; }
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
 </script>
