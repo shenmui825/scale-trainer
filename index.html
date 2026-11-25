@@ -608,7 +608,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.10.0 (25 Nov 2026)";
+const VER="0.10.1 (25 Nov 2026)";
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
 'use strict';
 const $=id=>document.getElementById(id);
@@ -1824,7 +1824,10 @@ if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
 // ---------- Video Jam skrin penuh ----------
 (function(){
   const st=document.querySelector('.vjstage');
-  const showCtl=v=>st.classList.toggle('ctl',v);
+  let hideT=null;
+  const armHide=(ms)=>{ clearTimeout(hideT); hideT=setTimeout(()=>st.classList.remove('ctl'),ms||4000); };
+  const showCtl=v=>{ st.classList.toggle('ctl',v); if(v) armHide(); else clearTimeout(hideT); };
+  document.querySelector('.vjctl').addEventListener('click',()=>{ if(st.classList.contains('ctl')) armHide(); },true);
   let y0=null,t0=0;
   st.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
   st.addEventListener('touchend',e=>{ if(y0===null) return; const dy=e.changedTouches[0].clientY-y0; y0=null; if(Date.now()-t0>800) return; if(dy<-40) showCtl(true); else if(dy>40) showCtl(false); },{passive:true});
