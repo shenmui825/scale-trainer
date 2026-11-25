@@ -407,19 +407,9 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
   </ol>
  </section>
  <section class="panel" id="fxPanel">
-  <h3 class="jh">Kesan audio rakaman</h3>
+  <h3 class="jh">Perlindungan audio</h3>
   <label class="fxrow sw"><input type="checkbox" id="fxLim"><span><b>Limiter automatik</b><small>Halang bunyi pecah bila petikan terlalu kuat</small></span></label>
-  <div class="fxgrp">
-   <div class="fxhead"><b>Reverb</b><div class="seg" id="fxRev"><button data-v="off">Tutup</button><button data-v="room">Bilik</button><button data-v="hall">Dewan</button></div></div>
-   <label class="fxsl">Jumlah <input type="range" id="fxRevMix" min="0" max="100"><output id="fxRevMixV"></output></label>
-  </div>
-  <div class="fxgrp">
-   <div class="fxhead"><b>Delay</b><label class="sw mini"><input type="checkbox" id="fxDly"></label></div>
-   <label class="fxsl">Masa <input type="range" id="fxDlyMs" min="80" max="800" step="10"><output id="fxDlyMsV"></output></label>
-   <label class="fxsl">Ulangan <input type="range" id="fxDlyFb" min="0" max="80"><output id="fxDlyFbV"></output></label>
-   <label class="fxsl">Jumlah <input type="range" id="fxDlyMix" min="0" max="100"><output id="fxDlyMixV"></output></label>
-  </div>
-  <div class="hint">Kesan ini hanya masuk ke video yang dirakam. Guna "Uji dengar 10 saat" di bawah untuk dengar hasilnya.</div>
+
  </section>
  <section class="panel" id="balPanel">
   <h3 class="jh">Semak imbangan gitar dan Spotify</h3>
@@ -547,7 +537,7 @@ const LABEL={ok:'TEPAT',early:'AWAL',late:'LAMBAT',wrong:'NOTA SALAH',miss:'TERL
 const nn=m=>NOTE[((m%12)+12)%12];
 const nname=m=>nn(m)+(Math.floor(m/12)-1);
 
-let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true,fxRev:'off',fxRevMix:25,fxDly:false,fxDlyMs:300,fxDlyFb:30,fxDlyMix:20};
+let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true};
 try{ const j=JSON.parse(localStorage.getItem('scaleTrainer')||'null'); if(j) S=Object.assign(S,j); }catch(e){}
 const save=()=>{ try{ localStorage.setItem('scaleTrainer',JSON.stringify(S)); }catch(e){} };
 
@@ -1621,27 +1611,11 @@ function fxApply(){
   if(!afx) return; const c=vjActx, t=c.currentTime;
   try{ afx.sum.disconnect(); afx.lim.disconnect(); }catch(e){}
   if(S.fxLim){ afx.sum.connect(afx.lim); afx.lim.connect(afx.out); } else afx.sum.connect(afx.out);
-  const rv=S.fxRev||'off';
-  if(rv!=='off'){ if(afx.irKind!==rv){ afx.conv.buffer=makeIR(c,rv==='hall'?2.6:0.9,rv==='hall'?2.2:3.2); afx.irKind=rv; } afx.rWet.gain.setTargetAtTime(S.fxRevMix/100*0.8,t,0.05); }
-  else afx.rWet.gain.setTargetAtTime(0,t,0.05);
-  afx.dly.delayTime.setTargetAtTime(S.fxDlyMs/1000,t,0.05);
-  afx.dFb.gain.setTargetAtTime(S.fxDly?S.fxDlyFb/100*0.85:0,t,0.05);
-  afx.dWet.gain.setTargetAtTime(S.fxDly?S.fxDlyMix/100:0,t,0.05);
-  afx.dIn.gain.setTargetAtTime(S.fxDly?1:0,t,0.05);
-  afx.dry.gain.setTargetAtTime(1,t,0.05);
+  afx.rWet.gain.value=0; afx.dWet.gain.value=0; afx.dFb.gain.value=0; afx.dIn.gain.value=0; afx.dry.gain.value=1;
 }
 function recAudioTracks(){ return (afx&&afx.dest)?afx.dest.stream.getAudioTracks():vjAudS.getAudioTracks(); }
-function fxUI(){
-  $('fxLim').checked=!!S.fxLim; $('fxDly').checked=!!S.fxDly;
-  document.querySelectorAll('#fxRev button').forEach(b=>b.classList.toggle('on',b.dataset.v===(S.fxRev||'off')));
-  [['fxRevMix','%'],['fxDlyMs',' ms'],['fxDlyFb','%'],['fxDlyMix','%']].forEach(([k,u])=>{ $(k).value=S[k]; $(k+'V').textContent=S[k]+u; });
-  $('fxRevMix').closest('.fxgrp').classList.toggle('off',(S.fxRev||'off')==='off');
-  $('fxDly').closest('.fxgrp').classList.toggle('off',!S.fxDly);
-}
+function fxUI(){ $('fxLim').checked=!!S.fxLim; }
 $('fxLim').onchange=e=>{ S.fxLim=e.target.checked; save(); fxApply(); };
-$('fxDly').onchange=e=>{ S.fxDly=e.target.checked; save(); fxUI(); fxApply(); };
-$('fxRev').onclick=e=>{ const b=e.target.closest('button'); if(!b) return; S.fxRev=b.dataset.v; save(); fxUI(); fxApply(); };
-['fxRevMix','fxDlyMs','fxDlyFb','fxDlyMix'].forEach(k=>$(k).addEventListener('input',e=>{ S[k]=Number(e.target.value); save(); fxUI(); fxApply(); }));
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&vjActx) try{ vjActx.resume(); }catch(e){} });
 fxUI();
 
