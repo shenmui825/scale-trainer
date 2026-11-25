@@ -1829,7 +1829,7 @@ if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
   st.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
   st.addEventListener('touchend',e=>{ if(y0===null) return; const dy=e.changedTouches[0].clientY-y0; y0=null; if(Date.now()-t0>800) return; if(dy<-40) showCtl(true); else if(dy>40) showCtl(false); },{passive:true});
   $('vjHandle').onclick=()=>showCtl(true);
-  const ctl=document.querySelector('.vjctl'), mq=window.matchMedia('(max-width:900px)');
+  const ctl=document.querySelector('.vjctl'), mq=window.matchMedia?window.matchMedia('(max-width:900px)'):{matches:window.innerWidth<=900,addListener(){}};
   const place=()=>{ if(mq.matches){ if(ctl.parentNode!==st) st.appendChild(ctl); } else if(ctl.parentNode===st) st.after(ctl); };
   place(); mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place);
   const sheet=$('vjSheet'), shade=$('vjShade');
