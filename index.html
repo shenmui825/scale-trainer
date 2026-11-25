@@ -608,7 +608,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.11.0 (25 Nov 2026)";
+const VER="0.11.1 (25 Nov 2026)";
 const IS_TOUCHDEV=(()=>{ try{ if(navigator.userAgentData&&navigator.userAgentData.mobile) return true; }catch(e){} const ua=navigator.userAgent||''; if(/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua)) return true; if(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1) return true; return false; })();
 document.body.classList.toggle('touchdev',IS_TOUCHDEV);
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
@@ -1443,6 +1443,7 @@ function renderNota(){
 const MODE_TITLE={tuner:'Guitar Tuner',practice:'Latihan Scale',jam:'Video Jamming',prog:'Kemajuan',nota:'Informasi'};
 function setMode(m){
   if(m==='jam'&&!IS_TOUCHDEV) m='practice';
+  if(S.mode==='jam'&&m!=='jam'&&typeof vjStopCam==='function') vjStopCam();
   if(S.mode&&S.mode!=='jam'&&m==='jam') S.lastMode=S.mode;
   S.mode=m; save(); document.body.dataset.mode=m;
   { const t=MODE_TITLE[m]||'Video Jamming'; $('appTitle').textContent='🎸 '+t; document.title=t; }
@@ -1684,7 +1685,18 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&vjRecObj) toast('Rakaman mungkin terhenti bila keluar dari app.',4000);
 });
 navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',vjListAud);
-function renderJam(){ if(!vjVid) vjMsg(IS_TOUCHDEV?'Leret ke atas, kemudian tekan "Kamera" untuk mula.':'Tekan "Kamera" untuk mula.'); }
+let vjWasOn=false;
+function vjStopCam(){
+  if(vjRecObj) return false;
+  vjWasOn=!!vjVid;
+  try{ if(vjVid) vjVid.getTracks().forEach(t=>t.stop()); }catch(e){}
+  try{ if(vjAudS) vjAudS.getTracks().forEach(t=>t.stop()); }catch(e){}
+  vjVid=null; vjAudS=null; vjAn=null;
+  try{ $('vjPrev').srcObject=null; }catch(e){}
+  $('vjCam').textContent='Kamera'; $('vjRes').classList.remove('on');
+  return true;
+}
+function renderJam(){ if(!vjVid&&vjWasOn){ vjOpenCam(); return; } if(!vjVid) vjMsg(IS_TOUCHDEV?'Leret ke atas, kemudian tekan "Kamera" untuk mula.':'Tekan "Kamera" untuk mula.'); }
 
 
 
