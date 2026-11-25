@@ -259,6 +259,23 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 .vjitem .rt{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
 .vjbtns{display:flex;gap:8px}.vjbtns a,.vjbtns button{flex:1;min-height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;text-decoration:none;font-size:14px}
 .vjbtns a{background:#f5b301;color:#111}
+
+/* ===== Imbangan bunyi ===== */
+.balsteps{display:flex;flex-direction:column;gap:8px}
+.bstep2{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.bstep2>b{width:30px;height:30px;border-radius:50%;background:#1f5fd6;display:grid;place-items:center;font-size:15px}
+.bstep2.done>b{background:#4ade80;color:#05210f}.bstep2.run{border-color:#f5b301}
+.bt{font-weight:700}.bd{font-size:13px;color:var(--muted)}
+.bmeas{min-height:44px;padding:0 18px;border-radius:12px;font-weight:700}
+.balbars{display:flex;flex-direction:column;gap:8px;margin:14px 0 10px}
+.bbar{display:grid;grid-template-columns:64px 1fr 70px;gap:10px;align-items:center;font-size:14px}.bbar b{text-align:right}
+.btrack{position:relative;height:16px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+.bfill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;transition:width .15s}.bfill.sp{background:#1db954}.bfill.gt{background:#f5b301}
+.bzone{position:absolute;right:0;top:0;bottom:0;width:6%;background:rgba(251,113,133,.35)}
+.balres{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;line-height:1.5}
+.balres.ok{border-color:#4ade80}.balres.warn{border-color:#f5b301}.balres.bad{border-color:#fb7185}
+.balres big{display:block;font-size:20px;font-weight:800;margin-bottom:4px}
+.balact{display:flex;gap:8px;margin-top:10px}.balact button{flex:1;min-height:44px;border-radius:12px;font-weight:700}
 </style>
 </head>
 <body>
@@ -374,6 +391,20 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
    <li>Tekan <b>Buka Spotify</b>, pilih lagu dan bahagian yang kau mahu, tekan main, kemudian kembali ke sini.</li>
    <li>Tekan butang merah untuk rakam. Tekan lagi untuk berhenti.</li>
   </ol>
+ </section>
+ <section class="panel" id="balPanel">
+  <h3 class="jh">Semak imbangan gitar dan Spotify</h3>
+  <div class="balsteps">
+   <div class="bstep2" id="bs1"><b>1</b><div><div class="bt">Spotify sahaja</div><div class="bd">Main lagu di Spotify. Jangan petik gitar.</div></div><button class="bmeas" data-k="sp">Ukur</button></div>
+   <div class="bstep2" id="bs2"><b>2</b><div><div class="bt">Gitar sahaja</div><div class="bd">Jeda Spotify. Petik gitar seperti biasa.</div></div><button class="bmeas" data-k="gt">Ukur</button></div>
+  </div>
+  <div class="balbars">
+   <div class="bbar"><span>Spotify</span><div class="btrack"><div id="bbSp" class="bfill sp"></div><div class="bzone"></div></div><b id="bvSp">—</b></div>
+   <div class="bbar"><span>Gitar</span><div class="btrack"><div id="bbGt" class="bfill gt"></div><div class="bzone"></div></div><b id="bvGt">—</b></div>
+  </div>
+  <div id="balRes" class="balres">Ukur kedua-dua langkah untuk lihat keputusan.</div>
+  <div class="balact"><button id="balTest">Uji dengar 10 saat</button><button id="balReset">Ulang semula</button></div>
+  <audio id="balAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
  </section>
  <section class="panel"><h3 class="jh">Rakaman</h3><div id="vjList"><div class="hint">Belum ada rakaman.</div></div></section>
 </div>
@@ -1523,6 +1554,62 @@ document.addEventListener('visibilitychange',()=>{
 });
 navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',vjListAud);
 function renderJam(){ if(!vjVid) vjMsg('Tekan "Buka kamera" untuk mula.'); }
+
+
+// ---------- Semak imbangan ----------
+const bal={sp:null,gt:null,busy:false};
+const toDb=v=>v>1e-6?20*Math.log10(v):-120;
+const dbPct=db=>Math.max(0,Math.min(100,(db+60)/60*100));
+async function balEnsure(){
+  if(vjAn&&vjAudS&&vjAudS.getAudioTracks()[0].readyState==='live') return true;
+  try{ await vjListAud(); await vjOpenAudio(); await vjListAud(); return true; }catch(e){ toast('Tak dapat buka input bunyi: '+e.message); return false; }
+}
+function balMeasure(k){
+  if(bal.busy) return; bal.busy=true; try{ vjActx&&vjActx.resume(); }catch(e){}
+  const row=$(k==='sp'?'bs1':'bs2'), btn=row.querySelector('button'); row.classList.add('run'); row.classList.remove('done');
+  const wins=[]; let peak=0, t0=performance.now(), dur=5000;
+  const buf=new Float32Array(vjAn.fftSize);
+  const it=setInterval(()=>{
+    vjAn.getFloatTimeDomainData(buf); let sq=0,pk=0; for(const x of buf){ sq+=x*x; const a=Math.abs(x); if(a>pk) pk=a; }
+    const rms=Math.sqrt(sq/buf.length); wins.push(rms); peak=Math.max(peak,pk);
+    const left=Math.ceil((dur-(performance.now()-t0))/1000); btn.textContent=left>0?left+' s':'…';
+    $(k==='sp'?'bbSp':'bbGt').style.width=dbPct(toDb(rms))+'%';
+    if(performance.now()-t0>=dur){
+      clearInterval(it); bal.busy=false; row.classList.remove('run'); row.classList.add('done'); btn.textContent='Ukur semula';
+      wins.sort((a,b)=>a-b); const lvl=wins[Math.floor(wins.length*0.8)]||0;
+      bal[k]={db:toDb(lvl),peak:toDb(peak)};
+      $(k==='sp'?'bbSp':'bbGt').style.width=dbPct(bal[k].db)+'%';
+      $(k==='sp'?'bvSp':'bvGt').textContent=bal[k].db<-55?'senyap':Math.round(bal[k].db)+' dB';
+      balResult();
+    }
+  },50);
+}
+function balResult(){
+  const r=$('balRes'); r.className='balres';
+  if(!bal.sp||!bal.gt){ r.textContent=bal.sp?'Langkah 1 siap. Sekarang ukur gitar sahaja.':'Langkah 2 siap. Sekarang ukur Spotify sahaja.'; return; }
+  if(bal.sp.db<-55||bal.gt.db<-55){ r.classList.add('bad'); r.innerHTML=`<big>Tiada bunyi dikesan</big>${bal.sp.db<-55?'Spotify':'Gitar'} hampir senyap semasa diukur. Pastikan input bunyi betul dan bunyi dimainkan sepanjang 5 saat, kemudian ukur semula.`; return; }
+  const d=bal.gt.db-bal.sp.db, clip=Math.max(bal.sp.peak,bal.gt.peak)>-1, low=Math.max(bal.sp.db,bal.gt.db)<-35;
+  let cls,title,msg;
+  if(d<0){ cls='bad'; title='Gitar tenggelam'; msg=`Gitar ${Math.abs(d).toFixed(1)} dB lebih perlahan dari Spotify. Turunkan volume telefon (Spotify) 2 hingga 3 tekan, atau naikkan volume patch MG-50.`; }
+  else if(d<2){ cls='warn'; title='Gitar sedikit rendah'; msg=`Gitar hanya ${d.toFixed(1)} dB di atas Spotify. Turunkan volume telefon 1 tekan supaya gitar lebih jelas.`; }
+  else if(d<=7){ cls='ok'; title='Seimbang'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Gitar jelas dan backing masih kedengaran penuh.`; }
+  else { cls='warn'; title='Backing terlalu perlahan'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Naikkan volume telefon (Spotify) 1 hingga 2 tekan.`; }
+  if(clip){ cls='bad'; msg+=' Ada bunyi pecah (clipping). Kurangkan volume master MG-50 sedikit.'; }
+  else if(low) msg+=' Paras keseluruhan agak rendah. Naikkan volume master MG-50 sedikit.';
+  r.classList.add(cls); r.innerHTML=`<big>${title}</big>${msg}`;
+}
+document.querySelectorAll('.bmeas').forEach(b=>b.addEventListener('click',async()=>{ if(!(await balEnsure())) return; balMeasure(b.dataset.k); }));
+$('balReset').onclick=()=>{ bal.sp=bal.gt=null; ['bs1','bs2'].forEach(id=>{ $(id).classList.remove('done','run'); $(id).querySelector('button').textContent='Ukur'; }); ['bbSp','bbGt'].forEach(id=>$(id).style.width='0'); $('bvSp').textContent=$('bvGt').textContent='—'; $('balRes').className='balres'; $('balRes').textContent='Ukur kedua-dua langkah untuk lihat keputusan.'; $('balAudio').style.display='none'; };
+$('balTest').onclick=async()=>{
+  if(bal.busy||vjRecObj) return; if(!(await balEnsure())) return;
+  const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm'].find(m=>MediaRecorder.isTypeSupported(m))||'';
+  let r; try{ r=new MediaRecorder(new MediaStream(vjAudS.getAudioTracks()),mime?{mimeType:mime,audioBitsPerSecond:256000}:undefined); }catch(e){ toast('Tak dapat rakam ujian: '+e.message); return; }
+  const ch=[]; r.ondataavailable=e=>{ if(e.data.size) ch.push(e.data); }; bal.busy=true;
+  const btn=$('balTest'); let left=10; btn.textContent='Merakam… 10 s';
+  const it=setInterval(()=>{ left--; btn.textContent=left>0?'Merakam… '+left+' s':'…'; },1000);
+  r.onstop=()=>{ clearInterval(it); bal.busy=false; btn.textContent='Uji dengar 10 saat'; const a=$('balAudio'); a.src=URL.createObjectURL(new Blob(ch,{type:r.mimeType||'audio/webm'})); a.style.display='block'; a.play().catch(()=>{}); toast('Dengar menggunakan earphone MG-50 untuk nilai imbangan.',3500); };
+  r.start(); setTimeout(()=>r.stop(),10000);
+};
 
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
