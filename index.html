@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scale Trainer – NUX MG-50</title>
+<title>Scale Trainer</title>
 <style>
 :root{--bg:#050d1f;--glass:rgba(255,255,255,.045);--line:rgba(255,255,255,.09);--text:#f2f6ff;--muted:#9db4e0;
 --accent:#2f7bd0;--accent2:#dba111;--ok:#2ecc71;--early:#4cc9f0;--late:#ff9f1c;--wrong:#ff4d6d;--miss:#6b7280;--panel2:rgba(255,255,255,.07)}
@@ -306,7 +306,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
   <label>Nota dikesan<span id="pitchRead">—</span></label>
   <label>Onset<span class="dot" id="onDot"></span></label>
  </div>
- <div class="hint" style="margin-top:8px">Gitar → MG-50 → USB → laptop. Pilih peranti “NUX / MG-50”. Dengar bunyi gitar dari headphone MG-50 (jangan monitor melalui speaker laptop).</div>
+ <div class="hint" style="margin-top:8px">Gitar → multi-effect → USB → laptop. Pilih peranti multi-effect (USB). Dengar bunyi gitar dari headphone multi-effect (jangan monitor melalui speaker laptop).</div>
 </section>
 
 <!-- ===== MOD TUNER ===== -->
@@ -400,8 +400,8 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
   </div>
   <div class="vjset"><label>Input bunyi<select id="vjAud"></select></label></div>
   <ol class="vjhelp">
-   <li>Sambung telefon ke MG-50Li dengan kabel USB.</li>
-   <li>Tekan <b>Buka kamera</b>, kemudian pilih input bunyi USB / MG-50.</li>
+   <li>Sambung telefon ke multi-effect dengan kabel USB.</li>
+   <li>Tekan <b>Buka kamera</b>, kemudian pilih input bunyi USB / multi-effect.</li>
    <li>Tekan <b>Buka Spotify</b>, pilih lagu dan bahagian yang kau mahu, tekan main, kemudian kembali ke sini.</li>
    <li>Tekan butang merah untuk rakam. Tekan lagi untuk berhenti.</li>
   </ol>
@@ -815,7 +815,7 @@ async function refreshDevices(sel){
   const list=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
   const dev=$('dev'); dev.innerHTML='';
   list.forEach(d=>{ const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||('Input '+(dev.length+1)); dev.appendChild(o); });
-  let pick=sel; if(!pick){ const nux=list.find(d=>/nux|mg-?50/i.test(d.label)); if(nux) pick=nux.deviceId; }
+  let pick=sel; if(!pick){ const nux=list.find(d=>/usb|nux|mg-?50|valeton|mooer|zoom|line ?6|boss|tonex|interface/i.test(d.label)); if(nux) pick=nux.deviceId; }
   if(pick) dev.value=pick;
   return dev.value;
 }
@@ -1283,11 +1283,11 @@ chord:{g:'Chord',t:'Family chord',h:()=>{
  H('Guna untuk solo')+P('Kenal pasti kunci lagu, dapatkan family chord, dan solo guna scale yang sama dengan kunci. Untuk warna lain, tukar scale mengikut chord yang sedang dimainkan, contoh Dorian atas chord m7. Untuk scale 5 nota dan Blues, family chord diambil daripada scale induk (major atau natural minor).');
  }},
 app:{g:'Aplikasi',t:'Cara guna aplikasi',h:()=>
- H('Langkah asas')+P('1. Sambung gitar ke NUX MG-50, dan MG-50 ke laptop melalui USB. 2. Tekan Sambung input dan pilih peranti NUX atau MG-50. 3. Pilih tab Latihan Scale, kemudian pilih kunci dan scale. 4. Tekan Mula (atau Space). App bagi 4 klik pengira, dan selepas itu nota bergerak mengikut metronom. 5. Petik nota yang dipaparkan tepat pada rentak.')+
+ H('Langkah asas')+P('1. Sambung gitar ke multi-effect, dan multi-effect ke laptop melalui USB. 2. Tekan Sambung input dan pilih peranti multi-effect (USB). 3. Pilih tab Latihan Scale, kemudian pilih kunci dan scale. 4. Tekan Mula (atau Space). App bagi 4 klik pengira, dan selepas itu nota bergerak mengikut metronom. 5. Petik nota yang dipaparkan tepat pada rentak.')+
  H('Maksud keputusan')+P('Tepat: nota betul dan masa dalam julat toleransi. Awal atau Lambat: nota betul tetapi terlalu awal atau lewat. Nota salah: nota yang dipetik bukan nota sasaran. Terlepas: tiada nota dikesan pada masanya. Meter ketepatan menunjukkan sisihan setiap petikan dalam milisaat.')+
  H('Tetapan penting')+P('Toleransi: berapa ms dianggap tepat. Sensitiviti: kalau petikan tak dikesan, naikkan. Kalau bunyi bising dikesan, turunkan. Kalibrasi: ukur kelewatan sistem kau supaya timing adil. Nota per beat: 1 nota setiap klik, 2 (separuh), 3 (triplet) atau 4 (suku). Bunyi tali: nota sasaran berbunyi sendiri sebagai panduan. Buzzer: bunyi amaran bila salah.')+
  H('Tuner')+P('Tab Tuner menunjukkan nota yang kau petik dan sama ada ia sharp atau flat. Tekan pasak tali untuk dengar nota rujukan. A4 = 440 Hz secara default.')+
- H('Had app')+P('App mengesan satu nota pada satu masa. Hammer-on, pull-off dan chord tidak dikesan dengan tepat. Dengar bunyi gitar melalui headphone MG-50 dan bukan speaker laptop supaya tiada gema masuk ke mikrofon.')},
+ H('Had app')+P('App mengesan satu nota pada satu masa. Hammer-on, pull-off dan chord tidak dikesan dengan tepat. Dengar bunyi gitar melalui headphone multi-effect dan bukan speaker laptop supaya tiada gema masuk ke mikrofon.')},
 tip:{g:'Aplikasi',t:'Tip latihan',h:()=>
  H('Mula perlahan')+P('Mulakan pada 60 BPM atau lebih perlahan. Ketepatan lebih penting dari kelajuan. Naikkan 5 BPM hanya bila skor Tepat melebihi 90 peratus.')+
  H('Rutin 15 minit')+P('3 minit panaskan jari dengan satu posisi. 5 minit latih scale dengan metronom dalam app. 5 minit bina frasa dan improvisasi atas backing track. 2 minit ulang bahagian yang paling banyak silap.')+
@@ -1512,7 +1512,7 @@ async function vjListAud(){
     const ds=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput');
     const cur=$('vjAud').value;
     $('vjAud').innerHTML=ds.map((d,i)=>`<option value="${d.deviceId}">${d.label||('Input '+(i+1))}</option>`).join('');
-    const pick=ds.find(d=>/usb|nux|mg-?50/i.test(d.label));
+    const pick=ds.find(d=>/usb|nux|mg-?50|valeton|mooer|zoom|line ?6|boss|tonex|interface/i.test(d.label));
     if(cur&&ds.some(d=>d.deviceId===cur)) $('vjAud').value=cur; else if(pick) $('vjAud').value=pick.deviceId;
   }catch(e){}
 }
@@ -1562,7 +1562,7 @@ $('vjRec').onclick=async()=>{
     $('vjList').prepend(el);
     try{ const a=document.createElement('a'); a.href=url; a.download=nm; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(()=>a.remove(),1000); toast('Video disimpan automatik ke folder Downloads: '+nm,4500); }
     catch(e){ toast('Tak dapat simpan automatik. Tekan Simpan untuk muat turun.',4000); }
-    if(clipN>0) setTimeout(()=>toast('Amaran: bunyi pecah (clipping) dikesan '+clipN+' kali dalam rakaman. Kurangkan volume master MG-50 sedikit.',6000),4800);
+    if(clipN>0) setTimeout(()=>toast('Amaran: bunyi pecah (clipping) dikesan '+clipN+' kali dalam rakaman. Kurangkan volume master multi-effect sedikit.',6000),4800);
   };
   clipN=0; try{ vjActx.resume(); }catch(e){}
   vjRecObj.start(1000); vjT0=performance.now();
@@ -1653,12 +1653,12 @@ function balResult(){
   if(bal.sp.db<-55||bal.gt.db<-55){ r.classList.add('bad'); r.innerHTML=`<big>Tiada bunyi dikesan</big>${bal.sp.db<-55?'Spotify':'Gitar'} hampir senyap semasa diukur. Pastikan input bunyi betul dan bunyi dimainkan sepanjang 5 saat, kemudian ukur semula.`; return; }
   const d=bal.gt.db-bal.sp.db, clip=Math.max(bal.sp.peak,bal.gt.peak)>-1, low=Math.max(bal.sp.db,bal.gt.db)<-35;
   let cls,title,msg;
-  if(d<0){ cls='bad'; title='Gitar tenggelam'; msg=`Gitar ${Math.abs(d).toFixed(1)} dB lebih perlahan dari Spotify. Turunkan volume telefon (Spotify) 2 hingga 3 tekan, atau naikkan volume patch MG-50.`; }
+  if(d<0){ cls='bad'; title='Gitar tenggelam'; msg=`Gitar ${Math.abs(d).toFixed(1)} dB lebih perlahan dari Spotify. Turunkan volume telefon (Spotify) 2 hingga 3 tekan, atau naikkan volume patch multi-effect.`; }
   else if(d<2){ cls='warn'; title='Gitar sedikit rendah'; msg=`Gitar hanya ${d.toFixed(1)} dB di atas Spotify. Turunkan volume telefon 1 tekan supaya gitar lebih jelas.`; }
   else if(d<=7){ cls='ok'; title='Seimbang'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Gitar jelas dan backing masih kedengaran penuh.`; }
   else { cls='warn'; title='Backing terlalu perlahan'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Naikkan volume telefon (Spotify) 1 hingga 2 tekan.`; }
-  if(clip){ cls='bad'; msg+=' Ada bunyi pecah (clipping). Kurangkan volume master MG-50 sedikit.'; }
-  else if(low) msg+=' Paras keseluruhan agak rendah. Naikkan volume master MG-50 sedikit.';
+  if(clip){ cls='bad'; msg+=' Ada bunyi pecah (clipping). Kurangkan volume master multi-effect sedikit.'; }
+  else if(low) msg+=' Paras keseluruhan agak rendah. Naikkan volume master multi-effect sedikit.';
   r.classList.add(cls); r.innerHTML=`<big>${title}</big>${msg}`;
 }
 document.querySelectorAll('.bmeas').forEach(b=>b.addEventListener('click',async()=>{ if(!(await balEnsure())) return; balMeasure(b.dataset.k); }));
@@ -1670,7 +1670,7 @@ $('balTest').onclick=async()=>{
   const ch=[]; r.ondataavailable=e=>{ if(e.data.size) ch.push(e.data); }; bal.busy=true;
   const btn=$('balTest'); let left=10; btn.textContent='Merakam… 10 s';
   const it=setInterval(()=>{ left--; btn.textContent=left>0?'Merakam… '+left+' s':'…'; },1000);
-  r.onstop=()=>{ clearInterval(it); bal.busy=false; btn.textContent='Uji dengar 10 saat'; const a=$('balAudio'); a.src=URL.createObjectURL(new Blob(ch,{type:r.mimeType||'audio/webm'})); a.style.display='block'; a.play().catch(()=>{}); toast('Dengar menggunakan earphone MG-50 untuk nilai imbangan.',3500); };
+  r.onstop=()=>{ clearInterval(it); bal.busy=false; btn.textContent='Uji dengar 10 saat'; const a=$('balAudio'); a.src=URL.createObjectURL(new Blob(ch,{type:r.mimeType||'audio/webm'})); a.style.display='block'; a.play().catch(()=>{}); toast('Dengar menggunakan earphone multi-effect untuk nilai imbangan.',3500); };
   r.start(); setTimeout(()=>r.stop(),10000);
 };
 
