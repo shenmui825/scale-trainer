@@ -290,6 +290,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 .seg button.on{background:#1f5fd6;color:#fff;font-weight:700}
 .fxsl{display:grid;grid-template-columns:64px 1fr 56px;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:4px 0}.fxsl output{text-align:right;color:var(--text);font-weight:700}
 .fxgrp.off .fxsl{opacity:.4}
+.vjwarn{margin-top:8px;background:rgba(245,179,1,.12);border:1px solid rgba(245,179,1,.5);color:#f8d77a;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -399,8 +400,9 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
    <button id="vjCam" class="vjside">Buka kamera</button>
   </div>
   <div class="vjset"><label>Input bunyi<select id="vjAud"></select></label></div>
+  <div id="vjUsbWarn" class="vjwarn" style="display:none">Input USB tidak dikesan. Pastikan multi-effect disambung dengan kabel OTG dan menyokong USB OTG. Buat masa ini rakaman guna mikrofon telefon.</div>
   <ol class="vjhelp">
-   <li>Sambung telefon ke multi-effect dengan kabel USB.</li>
+   <li>Sambung telefon ke multi-effect dengan kabel USB OTG. Multi-effect mesti menyokong USB OTG (audio USB tanpa driver) untuk berfungsi dengan telefon.</li>
    <li>Tekan <b>Buka kamera</b>, kemudian pilih input bunyi USB / multi-effect.</li>
    <li>Tekan <b>Buka Spotify</b>, pilih lagu dan bahagian yang kau mahu, tekan main, kemudian kembali ke sini.</li>
    <li>Tekan butang merah untuk rakam. Tekan lagi untuk berhenti.</li>
@@ -1286,6 +1288,10 @@ app:{g:'Aplikasi',t:'Cara guna aplikasi',h:()=>
  H('Langkah asas')+P('1. Sambung gitar ke multi-effect, dan multi-effect ke laptop melalui USB. 2. Tekan Sambung input dan pilih peranti multi-effect (USB). 3. Pilih tab Latihan Scale, kemudian pilih kunci dan scale. 4. Tekan Mula (atau Space). App bagi 4 klik pengira, dan selepas itu nota bergerak mengikut metronom. 5. Petik nota yang dipaparkan tepat pada rentak.')+
  H('Maksud keputusan')+P('Tepat: nota betul dan masa dalam julat toleransi. Awal atau Lambat: nota betul tetapi terlalu awal atau lewat. Nota salah: nota yang dipetik bukan nota sasaran. Terlepas: tiada nota dikesan pada masanya. Meter ketepatan menunjukkan sisihan setiap petikan dalam milisaat.')+
  H('Tetapan penting')+P('Toleransi: berapa ms dianggap tepat. Sensitiviti: kalau petikan tak dikesan, naikkan. Kalau bunyi bising dikesan, turunkan. Kalibrasi: ukur kelewatan sistem kau supaya timing adil. Nota per beat: 1 nota setiap klik, 2 (separuh), 3 (triplet) atau 4 (suku). Bunyi tali: nota sasaran berbunyi sendiri sebagai panduan. Buzzer: bunyi amaran bila salah.')+
+
+ H('Keperluan Video Jam (telefon)')+P('Tab Jam di telefon memerlukan multi-effect yang menyokong USB OTG, iaitu boleh berfungsi sebagai peranti audio USB terus dengan telefon tanpa driver. Kebanyakan multi-effect ada port USB, tetapi sesetengahnya hanya untuk kemas kini firmware atau perlukan driver di komputer, jadi tidak boleh digunakan dengan telefon.')+
+ P('Cara semak: sambung multi-effect ke telefon dengan kabel OTG, buka tab Jam dan tekan Buka kamera. Kalau senarai Input bunyi menunjukkan peranti USB atau nama multi-effect, ia boleh digunakan. Semak juga manual atau laman pengeluar untuk perkataan "USB OTG", "class compliant" atau "USB audio interface".')+
+ P('Untuk bunyi Spotify masuk ke rakaman, multi-effect juga perlu menghantar bunyi dari telefon (playback USB) bercampur dengan gitar ke rakaman USB. Tidak semua model melakukannya.')+
  H('Tuner')+P('Tab Tuner menunjukkan nota yang kau petik dan sama ada ia sharp atau flat. Tekan pasak tali untuk dengar nota rujukan. A4 = 440 Hz secara default.')+
  H('Had app')+P('App mengesan satu nota pada satu masa. Hammer-on, pull-off dan chord tidak dikesan dengan tepat. Dengar bunyi gitar melalui headphone multi-effect dan bukan speaker laptop supaya tiada gema masuk ke mikrofon.')},
 tip:{g:'Aplikasi',t:'Tip latihan',h:()=>
@@ -1514,6 +1520,7 @@ async function vjListAud(){
     $('vjAud').innerHTML=ds.map((d,i)=>`<option value="${d.deviceId}">${d.label||('Input '+(i+1))}</option>`).join('');
     const pick=ds.find(d=>/usb|nux|mg-?50|valeton|mooer|zoom|line ?6|boss|tonex|interface/i.test(d.label));
     if(cur&&ds.some(d=>d.deviceId===cur)) $('vjAud').value=cur; else if(pick) $('vjAud').value=pick.deviceId;
+    const labelled=ds.some(d=>d.label); $('vjUsbWarn').style.display=(labelled&&!pick)?'block':'none';
   }catch(e){}
 }
 async function vjOpenAudio(){
