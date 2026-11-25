@@ -523,6 +523,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
+const VER="25.11.2026-1";
 'use strict';
 const $=id=>document.getElementById(id);
 const NOTE=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -1694,6 +1695,36 @@ $('balTest').onclick=async()=>{
   r.onstop=()=>{ clearInterval(it); bal.busy=false; btn.textContent='Uji dengar 10 saat'; const a=$('balAudio'); a.src=URL.createObjectURL(new Blob(ch,{type:r.mimeType||'audio/webm'})); a.style.display='block'; a.play().catch(()=>{}); toast('Dengar menggunakan earphone multi-effect untuk nilai imbangan.',3500); };
   r.start(); setTimeout(()=>r.stop(),10000);
 };
+
+
+/* semakan versi baru */
+(function(){
+  if(!location.protocol.startsWith("http"))return;
+  let bar=null;
+  function show(v){
+    if(bar)return;
+    bar=document.createElement("div");
+    bar.style.cssText="position:fixed;left:0;right:0;top:0;z-index:9999;background:#1f5fd6;color:#fff;padding:10px 12px;display:flex;gap:10px;align-items:center;justify-content:center;font:600 14px system-ui,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4)";
+    const t=document.createElement("span");t.textContent="Versi baru tersedia ("+v+")";t.style.cssText="flex:1;min-width:0";
+    const b=document.createElement("button");b.textContent="Kemas kini";
+    b.style.cssText="background:#f5b301;color:#1a1200;border:0;border-radius:8px;padding:8px 14px;font-weight:800;min-height:40px;white-space:nowrap";
+    b.onclick=async()=>{ if(typeof vjRecObj!=='undefined'&&vjRecObj){ toast('Hentikan rakaman dulu sebelum kemas kini.'); return; } try{ if(window.caches){ const k=await caches.keys(); await Promise.all(k.map(x=>caches.delete(x))); } }catch(e){} location.replace(location.pathname+"?v="+Date.now()); };
+    const x=document.createElement("button");x.textContent="✕";x.setAttribute("aria-label","Tutup");
+    x.style.cssText="background:transparent;color:#fff;border:0;font-size:18px;min-width:40px;min-height:40px";x.onclick=()=>{bar.remove();bar=null;};
+    bar.append(t,b,x);document.body.appendChild(bar);
+  }
+  async function check(){
+    try{
+      const r=await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"});
+      if(!r.ok)return;
+      const m=(await r.text()).match(/const VER="([^"]*)"/);
+      if(m&&m[1]!==VER)show(m[1]);
+    }catch(e){}
+  }
+  setTimeout(check,2500);
+  setInterval(check,5*60*1000);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check();});
+})();
 
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
