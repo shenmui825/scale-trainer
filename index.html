@@ -226,7 +226,7 @@ button{transition:transform .1s,filter .15s}button:hover{filter:brightness(1.12)
  .app{max-width:1400px;padding-left:112px}
 }
 @media(max-width:900px){
- .rail{position:sticky;top:0;z-index:5;margin:8px;border-radius:16px}.rlogo{display:none}
+ .rail{position:sticky;top:0;z-index:5;margin:8px;border-radius:16px;background:#0b1a38;box-shadow:0 6px 20px rgba(0,0,0,.45)}.rlogo{display:none}
  .rail .tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;font-size:11px}
  .pwrap{grid-template-columns:1fr}.pwrap .main{order:1}.pwrap .rside{order:2}.pwrap .side{order:3}
 }
@@ -1305,7 +1305,7 @@ $('btnCal').onclick=()=>startCalib();
 document.addEventListener('keydown',e=>{
   if(S.mode==='practice' && e.code==='Space' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){ e.preventDefault(); $('btnGo').click(); }
 });
-setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner');
+/* mod awal ditetapkan di hujung skrip */
 buildBoard(); onSeqChange(); renderStats(); renderTm();
 requestAnimationFrame(frame);
 
@@ -1521,6 +1521,9 @@ document.addEventListener('visibilitychange',()=>{
 });
 navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',vjListAud);
 function renderJam(){ if(!vjVid) vjMsg('Tekan "Buka kamera" untuk mula.'); }
+
+// ---------- Mula app (selepas semua kod dimuatkan) ----------
+try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
 </script>
 </body>
 </html>
