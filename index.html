@@ -296,7 +296,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
 <body>
 <nav class="tabs rail" aria-label="Menu"><div class="rlogo" aria-hidden="true">VJ</div><button class="tab" id="tabTuner" title="Tuner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M5 8l2 2M19 8l-2 2"/><path d="M4 18a8 8 0 0 1 16 0"/><path d="M12 18l3-5"/></svg><span>Tuner</span></button><button class="tab" id="tabPractice" title="Latihan scale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8l6 4-6 4z"/></svg><span>Latihan</span></button><button class="tab" id="tabJam" title="Jam dengan Spotify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg><span>Jam</span></button><button class="tab" id="tabProg" title="Kemajuan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>Kemajuan</span></button><button class="tab" id="tabNota" title="Informasi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h6"/></svg><span>Informasi</span></button></nav>
 <div class="app">
-<header><h1>🎸 Video Jamming</h1><span id="status" class="chip">Input belum disambung</span></header>
+<header><h1 id="appTitle">🎸 Video Jamming</h1><span id="status" class="chip">Input belum disambung</span></header>
 
 
 <section class="panel">
@@ -1347,8 +1347,10 @@ function renderNota(){
 }
 
 // ---------- Mod ----------
+const MODE_TITLE={tuner:'Guitar Tuner',practice:'Latihan Scale',jam:'Video Jamming',prog:'Kemajuan',nota:'Informasi'};
 function setMode(m){
   S.mode=m; save(); document.body.dataset.mode=m;
+  { const t=MODE_TITLE[m]||'Video Jamming'; $('appTitle').textContent='🎸 '+t; document.title=t; }
   $('tabTuner').classList.toggle('on',m==='tuner'); $('tabPractice').classList.toggle('on',m==='practice'); $('tabNota').classList.toggle('on',m==='nota'); $('tabProg').classList.toggle('on',m==='prog'); $('tabJam').classList.toggle('on',m==='jam');
   if(m!=='practice') stopSession(); if(m==='nota') renderNota(); if(m==='prog') renderProgress(); if(m==='jam') renderJam();
   tbuf=[]; lastKey='';
