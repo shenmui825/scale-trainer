@@ -337,6 +337,39 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
  .kp{min-height:40px}
  .tuner .pegcol{gap:10px}
 }
+
+/* ===== Video Jam skrin penuh (telefon) ===== */
+.vjmob{display:none}
+.vjsheet .panel{margin-bottom:12px}
+@media(max-width:900px){
+ .vjmob{display:flex}
+ body[data-mode=jam]{padding-bottom:0!important;overflow:hidden}
+ body[data-mode=jam] .rail,body[data-mode=jam] header,body[data-mode=jam] #inPanel,body[data-mode=jam] .verfoot{display:none!important}
+ body[data-mode=jam] .app{padding:0!important}
+ .vjpanel{padding:0!important;border:0!important;background:none!important;backdrop-filter:none!important;margin:0!important}
+ .vjstage{position:fixed!important;inset:0;width:100vw;height:100dvh;max-height:none!important;aspect-ratio:auto!important;border-radius:0!important;z-index:60;touch-action:none}
+ .vjtop{top:calc(10px + env(safe-area-inset-top));gap:8px;align-items:center}
+ .vjtop .vjrec{margin-left:auto}.vjtop #vjFlip{margin-left:auto}
+ .vjicon{background:rgba(0,0,0,.38)!important;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)!important}
+ .vjclip{margin:0}
+ #vjRes{top:calc(64px + env(safe-area-inset-top));bottom:auto;left:12px}
+ .vjmeter{top:calc(100px + env(safe-area-inset-top));bottom:auto;left:12px;right:auto;width:140px;height:6px}
+ .vjctl{position:absolute;left:0;right:0;bottom:0;margin:0!important;padding:28px 18px calc(28px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.55));transform:translateY(115%);transition:transform .28s ease;z-index:3}
+ .vjstage.ctl .vjctl{transform:none}
+ .vjspot{background:rgba(29,185,84,.32)!important;color:#fff!important;border:1px solid rgba(29,185,84,.75);backdrop-filter:blur(8px)}
+ .vjside{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;backdrop-filter:blur(8px)}
+ .vjrecb{background:rgba(255,255,255,.08)!important}
+ .vjhandle{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.7);transition:opacity .2s;pointer-events:auto;cursor:pointer;z-index:2}
+ .vjhandle span{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.8)}
+ .vjstage.ctl .vjhandle{opacity:0;pointer-events:none}
+ .vjmsg{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+ .vjshade{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:65;display:none}
+ .vjshade.on{display:block}
+ .vjsheet{position:fixed;left:0;right:0;bottom:0;max-height:86dvh;overflow:auto;background:#0b1a38;border-radius:22px 22px 0 0;z-index:70;transform:translateY(105%);transition:transform .3s ease;padding:0 12px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+ .vjsheet.on{transform:none}
+ .vjsheethd{position:sticky;top:0;z-index:2;background:#0b1a38;justify-content:space-between;align-items:center;padding:14px 4px 10px;font-size:17px}
+ .vjsheet .panel{backdrop-filter:none;background:rgba(255,255,255,.03)}
+}
 </style>
 </head>
 <body>
@@ -436,25 +469,31 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
  <section class="panel vjpanel">
   <div class="vjstage">
    <video id="vjPrev" muted playsinline autoplay></video>
-   <div class="vjtop"><span id="vjRecDot" class="vjrec">REC <b id="vjTime">00:00</b></span><span id="vjClip" class="vjclip">CLIP</span><button id="vjFlip" class="vjicon" aria-label="Tukar kamera depan atau belakang"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><path d="M9 13a3 3 0 0 0 5 2M15 12a3 3 0 0 0-5-2"/></svg></button></div>
-   <div id="vjMsg" class="vjmsg">Tekan "Buka kamera" untuk mula.</div>
+   <div class="vjtop"><button id="vjExit" class="vjicon vjmob" aria-label="Keluar dari Video Jam"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><span id="vjRecDot" class="vjrec">REC <b id="vjTime">00:00</b></span><span id="vjClip" class="vjclip">CLIP</span><button id="vjFlip" class="vjicon" aria-label="Tukar kamera depan atau belakang"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><path d="M9 13a3 3 0 0 0 5 2M15 12a3 3 0 0 0-5-2"/></svg></button><button id="vjGear" class="vjicon vjmob" aria-label="Tetapan Video Jam"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
+   <div id="vjMsg" class="vjmsg">Tekan "Kamera" untuk mula.</div>
    <span id="vjRes" class="vjres"></span>
    <div class="vjmeter"><div id="vjLvl"></div></div>
+   <div class="vjhandle vjmob" id="vjHandle"><span></span>Leret ke atas untuk butang</div>
+   <div class="vjctl">
+    <a id="vjSpot" class="vjspot" href="#">Spotify</a>
+    <button id="vjRec" class="vjrecb" aria-label="Mula rakam"><span></span></button>
+    <button id="vjCam" class="vjside">Kamera</button>
+   </div>
   </div>
-  <div class="vjctl">
-   <a id="vjSpot" class="vjspot" href="#">Buka Spotify</a>
-   <button id="vjRec" class="vjrecb" aria-label="Mula rakam"><span></span></button>
-   <button id="vjCam" class="vjside">Buka kamera</button>
-  </div>
+ </section>
+ <div id="vjShade" class="vjshade"></div>
+ <div id="vjSheet" class="vjsheet">
+  <div class="vjsheethd vjmob"><b>Tetapan Video Jam</b><button id="vjSheetX" class="vjicon" aria-label="Tutup tetapan">✕</button></div>
+  <section class="panel">
   <div class="vjset"><label>Input bunyi<select id="vjAud"></select></label></div>
   <div id="vjUsbWarn" class="vjwarn" style="display:none">Input USB tidak dikesan. Pastikan multi-effect disambung dengan kabel OTG dan menyokong USB OTG. Buat masa ini rakaman guna mikrofon telefon.</div>
   <ol class="vjhelp">
    <li>Sambung telefon ke multi-effect dengan kabel USB OTG. Multi-effect mesti menyokong USB OTG (audio USB tanpa driver) untuk berfungsi dengan telefon.</li>
-   <li>Tekan <b>Buka kamera</b>, kemudian pilih input bunyi USB / multi-effect.</li>
-   <li>Tekan <b>Buka Spotify</b>, pilih lagu dan bahagian yang kau mahu, tekan main, kemudian kembali ke sini.</li>
+   <li>Tekan <b>Kamera</b>, kemudian pilih input bunyi USB / multi-effect di atas.</li>
+   <li>Tekan <b>Spotify</b>, pilih lagu dan bahagian yang kau mahu, tekan main, kemudian kembali ke sini.</li>
    <li>Tekan butang merah untuk rakam. Tekan lagi untuk berhenti.</li>
   </ol>
- </section>
+  </section>
  <section class="panel" id="fxPanel">
   <h3 class="jh">Perlindungan audio</h3>
   <label class="fxrow sw"><input type="checkbox" id="fxLim"><span><b>Limiter automatik</b><small>Halang bunyi pecah bila petikan terlalu kuat</small></span></label>
@@ -475,6 +514,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
   <audio id="balAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
  </section>
  <section class="panel"><h3 class="jh">Rakaman</h3><div id="vjList"><div class="hint">Belum ada rakaman.</div></div></section>
+ </div>
 </div>
 <div class="mode-prog" id="progWrap"></div>
 <div class="mode-nota" id="notaWrap"></div>
@@ -568,7 +608,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.9.1 (25 Nov 2026)";
+const VER="0.10.0 (25 Nov 2026)";
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
 'use strict';
 const $=id=>document.getElementById(id);
@@ -1341,7 +1381,7 @@ app:{g:'Aplikasi',t:'Cara guna aplikasi',h:()=>
  H('Tetapan penting')+P('Toleransi: berapa ms dianggap tepat. Sensitiviti: kalau petikan tak dikesan, naikkan. Kalau bunyi bising dikesan, turunkan. Kalibrasi: ukur kelewatan sistem kau supaya timing adil. Nota per beat: 1 nota setiap klik, 2 (separuh), 3 (triplet) atau 4 (suku). Bunyi tali: nota sasaran berbunyi sendiri sebagai panduan. Buzzer: bunyi amaran bila salah.')+
 
  H('Keperluan Video Jam (telefon)')+P('Tab Jam di telefon memerlukan multi-effect yang menyokong USB OTG, iaitu boleh berfungsi sebagai peranti audio USB terus dengan telefon tanpa driver. Kebanyakan multi-effect ada port USB, tetapi sesetengahnya hanya untuk kemas kini firmware atau perlukan driver di komputer, jadi tidak boleh digunakan dengan telefon.')+
- P('Cara semak: sambung multi-effect ke telefon dengan kabel OTG, buka tab Jam dan tekan Buka kamera. Kalau senarai Input bunyi menunjukkan peranti USB atau nama multi-effect, ia boleh digunakan. Semak juga manual atau laman pengeluar untuk perkataan "USB OTG", "class compliant" atau "USB audio interface".')+
+ P('Cara semak: sambung multi-effect ke telefon dengan kabel OTG, buka tab Jam dan tekan Kamera, kemudian buka Tetapan (ikon gear). Kalau senarai Input bunyi menunjukkan peranti USB atau nama multi-effect, ia boleh digunakan. Semak juga manual atau laman pengeluar untuk perkataan "USB OTG", "class compliant" atau "USB audio interface".')+
  P('Untuk bunyi Spotify masuk ke rakaman, multi-effect juga perlu menghantar bunyi dari telefon (playback USB) bercampur dengan gitar ke rakaman USB. Tidak semua model melakukannya.')+
  H('Tuner')+P('Tab Tuner menunjukkan nota yang kau petik dan sama ada ia sharp atau flat. Tekan pasak tali untuk dengar nota rujukan. A4 = 440 Hz secara default.')+
  H('Had app')+P('App mengesan satu nota pada satu masa. Hammer-on, pull-off dan chord tidak dikesan dengan tepat. Dengar bunyi gitar melalui headphone multi-effect dan bukan speaker laptop supaya tiada gema masuk ke mikrofon.')},
@@ -1400,6 +1440,7 @@ function renderNota(){
 // ---------- Mod ----------
 const MODE_TITLE={tuner:'Guitar Tuner',practice:'Latihan Scale',jam:'Video Jamming',prog:'Kemajuan',nota:'Informasi'};
 function setMode(m){
+  if(S.mode&&S.mode!=='jam'&&m==='jam') S.lastMode=S.mode;
   S.mode=m; save(); document.body.dataset.mode=m;
   { const t=MODE_TITLE[m]||'Video Jamming'; $('appTitle').textContent='🎸 '+t; document.title=t; }
   $('tabTuner').classList.toggle('on',m==='tuner'); $('tabPractice').classList.toggle('on',m==='practice'); $('tabNota').classList.toggle('on',m==='nota'); $('tabProg').classList.toggle('on',m==='prog'); $('tabJam').classList.toggle('on',m==='jam');
@@ -1592,7 +1633,7 @@ async function vjOpenCam(){
     vjVid=await navigator.mediaDevices.getUserMedia({video:{facingMode:vjFacing,width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}}});
     const v=$('vjPrev'); v.srcObject=vjVid; v.classList.toggle('mirror',vjFacing==='user'); v.play().catch(()=>{});
     await vjListAud(); await vjOpenAudio(); await vjListAud();
-    vjMsg(''); $('vjCam').textContent='Kamera dibuka'; vjShowRes();
+    vjMsg(''); $('vjCam').textContent='Kamera ✓'; vjShowRes();
   }catch(e){ vjMsg('Tak dapat buka kamera atau input bunyi: '+e.message); }
 }
 $('vjCam').onclick=vjOpenCam;
@@ -1640,7 +1681,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden'&&vjRecObj) toast('Rakaman mungkin terhenti bila keluar dari app.',4000);
 });
 navigator.mediaDevices&&navigator.mediaDevices.addEventListener&&navigator.mediaDevices.addEventListener('devicechange',vjListAud);
-function renderJam(){ if(!vjVid) vjMsg('Tekan "Buka kamera" untuk mula.'); }
+function renderJam(){ if(!vjVid) vjMsg(window.innerWidth<=900?'Leret ke atas, kemudian tekan "Kamera" untuk mula.':'Tekan "Kamera" untuk mula.'); }
 
 
 
@@ -1779,6 +1820,26 @@ $('balTest').onclick=async()=>{
 
 $('verFoot').textContent='Video Jamming · versi '+VER+' · '+VER_STAGE;
 if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
+
+// ---------- Video Jam skrin penuh ----------
+(function(){
+  const st=document.querySelector('.vjstage');
+  const showCtl=v=>st.classList.toggle('ctl',v);
+  let y0=null,t0=0;
+  st.addEventListener('touchstart',e=>{ y0=e.touches[0].clientY; t0=Date.now(); },{passive:true});
+  st.addEventListener('touchend',e=>{ if(y0===null) return; const dy=e.changedTouches[0].clientY-y0; y0=null; if(Date.now()-t0>800) return; if(dy<-40) showCtl(true); else if(dy>40) showCtl(false); },{passive:true});
+  $('vjHandle').onclick=()=>showCtl(true);
+  const ctl=document.querySelector('.vjctl'), mq=window.matchMedia('(max-width:900px)');
+  const place=()=>{ if(mq.matches){ if(ctl.parentNode!==st) st.appendChild(ctl); } else if(ctl.parentNode===st) st.after(ctl); };
+  place(); mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place);
+  const sheet=$('vjSheet'), shade=$('vjShade');
+  const openSheet=v=>{ sheet.classList.toggle('on',v); shade.classList.toggle('on',v); };
+  $('vjGear').onclick=()=>openSheet(true); $('vjSheetX').onclick=()=>openSheet(false); shade.onclick=()=>openSheet(false);
+  let sy=null; sheet.addEventListener('touchstart',e=>{ sy=sheet.scrollTop<=0?e.touches[0].clientY:null; },{passive:true});
+  sheet.addEventListener('touchend',e=>{ if(sy!==null&&e.changedTouches[0].clientY-sy>80) openSheet(false); sy=null; },{passive:true});
+  $('vjExit').onclick=()=>{ if(vjRecObj){ toast('Hentikan rakaman dulu.'); return; } openSheet(false); setMode(S.lastMode&&S.lastMode!=='jam'?S.lastMode:'practice'); };
+})();
+
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
 </script>
