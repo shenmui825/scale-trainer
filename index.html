@@ -496,6 +496,7 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
   </section>
  <section class="panel" id="fxPanel">
   <h3 class="jh">Perlindungan audio</h3>
+  <label class="fxrow sw"><input type="checkbox" id="spStop"><span><b>Hentikan Spotify bila berhenti rakam</b><small>Spotify dijeda automatik sebaik kau tekan berhenti</small></span></label>
   <label class="fxrow sw"><input type="checkbox" id="fxLim"><span><b>Limiter automatik</b><small>Halang bunyi pecah bila petikan terlalu kuat</small></span></label>
 
  </section>
@@ -608,7 +609,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.11.2 (26 Nov 2026)";
+const VER="0.12.0 (26 Nov 2026)";
 const IS_TOUCHDEV=(()=>{ try{ if(navigator.userAgentData&&navigator.userAgentData.mobile) return true; }catch(e){} const ua=navigator.userAgent||''; if(/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua)) return true; if(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1) return true; return false; })();
 document.body.classList.toggle('touchdev',IS_TOUCHDEV);
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
@@ -631,7 +632,7 @@ const LABEL={ok:'TEPAT',early:'AWAL',late:'LAMBAT',wrong:'NOTA SALAH',miss:'TERL
 const nn=m=>NOTE[((m%12)+12)%12];
 const nname=m=>nn(m)+(Math.floor(m/12)-1);
 
-let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true};
+let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true,spStop:true};
 try{ const j=JSON.parse(localStorage.getItem('scaleTrainer')||'null'); if(j) S=Object.assign(S,j); }catch(e){}
 const save=()=>{ try{ localStorage.setItem('scaleTrainer',JSON.stringify(S)); }catch(e){} };
 
@@ -1650,7 +1651,7 @@ let clipN=0, clipUntil=0;
 function vjMime(){ return ['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m))||''; }
 const vjFmt=sec=>String(Math.floor(sec/60)).padStart(2,'0')+':'+String(Math.floor(sec%60)).padStart(2,'0');
 $('vjRec').onclick=async()=>{
-  if(vjRecObj){ vjRecObj.stop(); return; }
+  if(vjRecObj){ if(S.spStop!==false) pauseOtherApps(); vjRecObj.stop(); return; }
   if(!vjVid||!vjVid.getVideoTracks()[0]||vjVid.getVideoTracks()[0].readyState!=='live'){ await vjOpenCam(); if(!vjVid) return; }
   if(!vjAudS||vjAudS.getAudioTracks()[0].readyState!=='live'){ try{ await vjOpenAudio(); }catch(e){ toast('Input bunyi tiada: '+e.message); return; } }
   const mime=vjMime();
@@ -1859,6 +1860,29 @@ if(window.innerWidth<=900) $('btnGo').textContent='▶ Mula';
 })();
 
 if(!IS_TOUCHDEV){ $('tabJam').style.display='none'; }
+
+// ---------- Jeda Spotify bila rakaman berhenti ----------
+let __quietUrl=null;
+function quietWavUrl(){
+  if(__quietUrl) return __quietUrl;
+  const sr=22050, n=sr*6, buf=new ArrayBuffer(44+n*2), v=new DataView(buf);
+  const w=(o,str)=>{ for(let i=0;i<str.length;i++) v.setUint8(o+i,str.charCodeAt(i)); };
+  w(0,'RIFF'); v.setUint32(4,36+n*2,true); w(8,'WAVE'); w(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++) v.setInt16(44+i*2,(Math.random()*2-1)*2,true);
+  __quietUrl=URL.createObjectURL(new Blob([buf],{type:'audio/wav'})); return __quietUrl;
+}
+function pauseOtherApps(){
+  try{
+    const a=new Audio(quietWavUrl()); a.volume=1; a.loop=false;
+    if(navigator.mediaSession){ try{ navigator.mediaSession.metadata=new MediaMetadata({title:'Video Jamming',artist:'Rakaman disimpan'}); }catch(e){} }
+    const p=a.play(); if(p&&p.catch) p.catch(()=>{});
+    setTimeout(()=>{ try{ a.pause(); a.removeAttribute('src'); a.load(); }catch(e){} },1800);
+  }catch(e){}
+}
+$('spStop').checked=S.spStop!==false;
+$('spStop').onchange=e=>{ S.spStop=e.target.checked; save(); };
+
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
 </script>
