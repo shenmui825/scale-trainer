@@ -608,7 +608,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.11.1 (25 Nov 2026)";
+const VER="0.11.2 (26 Nov 2026)";
 const IS_TOUCHDEV=(()=>{ try{ if(navigator.userAgentData&&navigator.userAgentData.mobile) return true; }catch(e){} const ua=navigator.userAgent||''; if(/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua)) return true; if(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1) return true; return false; })();
 document.body.classList.toggle('touchdev',IS_TOUCHDEV);
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
@@ -1785,7 +1785,7 @@ function balResult(){
   else if(d<2){ cls='warn'; title='Gitar sedikit rendah'; msg=`Gitar hanya ${d.toFixed(1)} dB di atas Spotify. Turunkan volume telefon 1 tekan supaya gitar lebih jelas.`; }
   else if(d<=7){ cls='ok'; title='Seimbang'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Gitar jelas dan backing masih kedengaran penuh.`; }
   else { cls='warn'; title='Backing terlalu perlahan'; msg=`Gitar ${d.toFixed(1)} dB di atas Spotify. Naikkan volume telefon (Spotify) 1 hingga 2 tekan.`; }
-  if(clip){ cls='bad'; msg+=' Ada bunyi pecah (clipping). Kurangkan volume master multi-effect sedikit.'; }
+  if(clip){ cls='bad'; title+=', tapi bunyi pecah'; msg+=' Tetapi ada bunyi pecah (clipping): paras terlalu tinggi. Turunkan volume master multi-effect sedikit, kemudian ukur semula. Sasaran: gitar sekitar -14 hingga -12 dB.'; }
   else if(low) msg+=' Paras keseluruhan agak rendah. Naikkan volume master multi-effect sedikit.';
   r.classList.add(cls); r.innerHTML=`<big>${title}</big>${msg}`;
 }
