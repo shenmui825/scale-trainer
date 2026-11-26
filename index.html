@@ -370,6 +370,10 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
  body.touchdev .vjsheethd{position:sticky;top:0;z-index:2;background:#0b1a38;justify-content:space-between;align-items:center;padding:14px 4px 10px;font-size:17px}
  body.touchdev .vjsheet .panel{backdrop-filter:none;background:rgba(255,255,255,.03)}
 
+.gainbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.gainhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.gainhd output{font-weight:800;color:#f5b301}
+.gainbox input[type=range]{width:100%}.gainbox small{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.gainbtns{display:flex;gap:8px;margin-top:6px}.gainbtns button{flex:1;min-height:40px;border-radius:10px;font-weight:700}
 </style>
 </head>
 <body>
@@ -497,6 +501,12 @@ body[data-mode=jam] .app>section.panel:not(.mode-jam){display:none!important}
  <section class="panel" id="fxPanel">
   <h3 class="jh">Perlindungan audio</h3>
   <label class="fxrow sw"><input type="checkbox" id="spStop"><span><b>Hentikan Spotify bila berhenti rakam</b><small>Spotify dijeda automatik sebaik kau tekan berhenti</small></span></label>
+  <div class="gainbox"><div class="gainhd"><b>Gain rakaman</b><output id="recGainV">0 dB</output></div>
+   <input type="range" id="recGain" min="-24" max="12" step="1" aria-label="Gain rakaman">
+   <div class="gainbtns"><button type="button" data-g="-3">−3 dB</button><button type="button" data-g="0">Reset</button><button type="button" data-g="3">+3 dB</button></div>
+   <small>Turunkan kalau CLIP muncul dalam rakaman, naikkan kalau rakaman terlalu perlahan.</small></div>
+  <label class="fxrow sw"><input type="checkbox" id="micAgc"><span><b>Auto gain untuk mikrofon telefon</b><small>Bila input bukan USB, Android kawal paras mikrofon supaya tak pecah</small></span></label>
+  <div id="clipWhy" class="vjwarn" style="display:none"></div>
   <label class="fxrow sw"><input type="checkbox" id="fxLim"><span><b>Limiter automatik</b><small>Halang bunyi pecah bila petikan terlalu kuat</small></span></label>
 
  </section>
@@ -609,7 +619,7 @@ registerProcessor('det', Det);
 </script>
 
 <script id="main">
-const VER="0.12.0 (26 Nov 2026)";
+const VER="0.13.0 (26 Nov 2026)";
 const IS_TOUCHDEV=(()=>{ try{ if(navigator.userAgentData&&navigator.userAgentData.mobile) return true; }catch(e){} const ua=navigator.userAgent||''; if(/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/i.test(ua)) return true; if(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1) return true; return false; })();
 document.body.classList.toggle('touchdev',IS_TOUCHDEV);
 const VER_STAGE=/^0\./.test(VER)?"Draf":"Final";
@@ -632,7 +642,7 @@ const LABEL={ok:'TEPAT',early:'AWAL',late:'LAMBAT',wrong:'NOTA SALAH',miss:'TERL
 const nn=m=>NOTE[((m%12)+12)%12];
 const nname=m=>nn(m)+(Math.floor(m/12)-1);
 
-let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true,spStop:true};
+let S={key:9,scale:'Pentatonic minor',dir:'updown',oct:2,bpm:70,per:2,tol:60,sens:5,exact:false,sub:false,offset:null,a4:440,mode:'tuner',buzz:true,pluck:true,pos:'all',fam:'triad',famOpen:false,view:'both',auto:false,fxLim:true,spStop:true,recGain:0,micAgc:true};
 try{ const j=JSON.parse(localStorage.getItem('scaleTrainer')||'null'); if(j) S=Object.assign(S,j); }catch(e){}
 const save=()=>{ try{ localStorage.setItem('scaleTrainer',JSON.stringify(S)); }catch(e){} };
 
@@ -1609,7 +1619,7 @@ const _uiFromS=uiFromS; uiFromS=function(){ _uiFromS(); buildKeyPills(); };
 buildKeyPills(); renderStats();
 
 // ---------- Video Jam ----------
-let vjVid=null, vjAudS=null, vjFacing='user', vjRecObj=null, vjChunks=[], vjT0=0, vjTimer=null, vjAn=null, vjActx=null, vjWake=null, vjN=0;
+let vjInIsUsb=false; let vjVid=null, vjAudS=null, vjFacing='user', vjRecObj=null, vjChunks=[], vjT0=0, vjTimer=null, vjAn=null, vjActx=null, vjWake=null, vjN=0;
 const isAndroid=/Android/i.test(navigator.userAgent);
 $('vjSpot').href=isAndroid?'intent://open#Intent;scheme=spotify;package=com.spotify.music;S.browser_fallback_url=https%3A%2F%2Fopen.spotify.com;end':'https://open.spotify.com';
 $('vjSpot').target=isAndroid?'_self':'_blank';
@@ -1627,8 +1637,10 @@ async function vjListAud(){
 }
 async function vjOpenAudio(){
   if(vjAudS) vjAudS.getTracks().forEach(t=>t.stop());
-  const id=$('vjAud').value;
-  vjAudS=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:2,sampleRate:48000}});
+  const id=$('vjAud').value, lab=($('vjAud').selectedOptions[0]||{}).textContent||'';
+  const usb=/usb|nux|mg-?50|valeton|mooer|zoom|line ?6|boss|tonex|interface/i.test(lab);
+  const agc=!usb&&S.micAgc!==false; vjInIsUsb=usb;
+  vjAudS=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:agc,channelCount:2,sampleRate:48000}});
   try{ vjActx=vjActx||new (window.AudioContext||window.webkitAudioContext)(); vjActx.resume(); fxBuild(); }catch(e){ console.error(e); }
 }
 async function vjOpenCam(){
@@ -1733,7 +1745,9 @@ function fxBuild(){
     afx=f;
   }
   afx.src=src; vjAn=c.createAnalyser(); vjAn.fftSize=1024; src.connect(vjAn);
-  src.connect(afx.dry); src.connect(afx.dIn); src.connect(afx.conv);
+  if(!afx.trim){ afx.trim=c.createGain(); afx.trim.connect(afx.dry); afx.trim.connect(afx.dIn); afx.trim.connect(afx.conv); }
+  afx.trim.gain.value=Math.pow(10,(S.recGain||0)/20);
+  src.connect(afx.trim);
   fxApply();
 }
 function fxApply(){
@@ -1882,6 +1896,20 @@ function pauseOtherApps(){
 }
 $('spStop').checked=S.spStop!==false;
 $('spStop').onchange=e=>{ S.spStop=e.target.checked; save(); };
+
+
+// ---------- Kawalan clip ----------
+function gainUI(){ const g=S.recGain||0; $('recGain').value=g; $('recGainV').textContent=(g>0?'+':'')+g+' dB'; }
+function setRecGain(g){ S.recGain=Math.max(-24,Math.min(12,Math.round(g))); save(); gainUI(); try{ if(afx&&afx.trim) afx.trim.gain.setTargetAtTime(Math.pow(10,S.recGain/20),vjActx.currentTime,0.03); }catch(e){} }
+$('recGain').addEventListener('input',e=>setRecGain(Number(e.target.value)));
+document.querySelectorAll('.gainbtns button').forEach(b=>b.onclick=()=>setRecGain(b.dataset.g==='0'?0:(S.recGain||0)+Number(b.dataset.g)));
+$('micAgc').checked=S.micAgc!==false;
+$('micAgc').onchange=async e=>{ S.micAgc=e.target.checked; save(); if(vjAudS&&!vjRecObj){ try{ await vjOpenAudio(); }catch(x){} } };
+let clipWhyT=0;
+setInterval(()=>{ const el=$('clipWhy'); if(!el) return; if(performance.now()<clipUntil){ clipWhyT=performance.now(); el.style.display='block';
+  el.textContent=vjInIsUsb?'CLIP dikesan pada isyarat dari multi-effect. Ia sudah pecah sebelum sampai ke app, jadi turunkan volume master multi-effect. Gain rakaman di atas hanya menurunkan paras rakaman.':(S.micAgc!==false?'CLIP dikesan pada mikrofon telefon walaupun auto gain hidup. Perlahankan bunyi speaker, atau jauhkan telefon dari speaker.':'CLIP dikesan pada mikrofon telefon. Hidupkan "Auto gain untuk mikrofon telefon", atau perlahankan bunyi speaker.'); }
+  else if(performance.now()-clipWhyT>6000) el.style.display='none'; },500);
+gainUI();
 
 // ---------- Mula app (selepas semua kod dimuatkan) ----------
 try{ setMode(['practice','nota','prog','jam'].includes(S.mode)?S.mode:'tuner'); }catch(e){ console.error(e); setMode('tuner'); }
